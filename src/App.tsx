@@ -1,10 +1,30 @@
-function App() {
- 
-  return (
-    <>
-      <h1>App</h1>
-    </>
-  )
-}
+import { Routes, Route } from 'react-router-dom';
+import Layout from './components/layout/Layout';
+import Home from './pages/Home';
+import CreatePost from './pages/CreatePost';
+import PostPage from './pages/PostPage';
+import EditPost from './pages/EditPost';
+import CategoryPage from './pages/CategoryPage';
+import { ThemeProvider } from './context/ThemeContext';
+import { LoadingProvider } from './context/LoadingContext';
+import { UserProvider } from './context/UserContext';
 
-export default App
+export default function App() {
+  return (
+    <LoadingProvider>
+      <ThemeProvider>
+        <UserProvider>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path='/' element={<Home />} />
+              <Route path='/create' element={<CreatePost />} />
+              <Route path='/post/:id' element={<PostPage />} />
+              <Route path='/post/:id/edit' element={<EditPost />} />
+              <Route path='/category/:category' element={<CategoryPage />} />
+            </Route>
+          </Routes>
+        </UserProvider>
+      </ThemeProvider>
+    </LoadingProvider>
+  );
+}
