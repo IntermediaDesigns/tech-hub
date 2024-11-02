@@ -20,28 +20,28 @@ export default function EditPost() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchPost();
-  }, [id]);
+    async function fetchPost() {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('id', id)
+        .single();
 
-  async function fetchPost() {
-    const { data, error } = await supabase
-      .from('posts')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) {
-      console.error('Error fetching post:', error);
-      navigate('/');
-    } else {
-      setTitle(data.title);
-      setContent(data.content || '');
-      setImageUrl(data.image_url || '');
-      setVideoUrl(data.video_url || '');
-      setFlag(data.flag || undefined);
+      if (error) {
+        console.error('Error fetching post:', error);
+        navigate('/');
+      } else {
+        setTitle(data.title);
+        setContent(data.content || '');
+        setImageUrl(data.image_url || '');
+        setVideoUrl(data.video_url || '');
+        setFlag(data.flag || undefined);
+      }
+      setLoading(false);
     }
-    setLoading(false);
-  }
+
+    fetchPost();
+  }, [id, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,7 +89,7 @@ export default function EditPost() {
     setImageUrl(url);
     if (url && videoUrl) {
       setVideoUrl('');
-      toast.info('Video removed as only one media type is allowed');
+      toast('Video removed as only one media type is allowed');
     }
   };
 
@@ -97,7 +97,7 @@ export default function EditPost() {
     setVideoUrl(url);
     if (url && imageUrl) {
       setImageUrl('');
-      toast.info('Image removed as only one media type is allowed');
+      toast('Image removed as only one media type is allowed');
     }
   };
 

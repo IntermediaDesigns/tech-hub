@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowUpCircle, Clock, TrendingUp } from 'lucide-react'
@@ -138,7 +139,7 @@ export default function Home () {
                     <h2 className='text-xl mt-4 font-semibold text-gray-900 w-full dark:text-white mb-2'>
                       {post.title}
                     </h2>
-                    <div className='flex items-center gap-4 mb-4'>
+                    <div className='flex items-center gap-4 mb-4 flex-wrap'>
                     {preferences?.showImagesOnFeed && post.image_url && (
                       <img
                         src={post.image_url}
@@ -149,7 +150,8 @@ export default function Home () {
                     {preferences?.showVideosOnFeed && post.video_url && (
                       <iframe
                         src={post.video_url}
-                        className="w-full aspect-video rounded-lg mb-2"
+                        title={post.title}
+                        className="min-w-[350px] aspect-video rounded-lg mb-2"
                         allowFullScreen
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       />

@@ -166,6 +166,7 @@ export default function MediaUpload ({
             />
           ) : (
             <iframe
+              title='Video preview'
               src={preview}
               className='w-full aspect-video rounded-lg'
               allowFullScreen

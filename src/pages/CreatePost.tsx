@@ -1,21 +1,31 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Send } from 'lucide-react'
-import { supabase, type PostFlag } from '../lib/supabase'
-import toast from 'react-hot-toast'
-import MediaUpload from '../components/MediaUpload'
-import PostFlagSelect from '../components/PostFlagSelect'
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Send } from 'lucide-react';
+import { supabase, type PostFlag } from '../lib/supabase';
+import toast from 'react-hot-toast';
+import MediaUpload from '../components/MediaUpload';
+import PostFlagSelect from '../components/PostFlagSelect';
+import ReferencedPost from '../components/ReferencedPost';
 
-export default function CreatePost () {
-  const navigate = useNavigate()
-  const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
-  const [imageUrl, setImageUrl] = useState('')
-  const [videoUrl, setVideoUrl] = useState('')
-  const [secretKey, setSecretKey] = useState('')
-  const [referenceId, setReferenceId] = useState('')
-  const [flag, setFlag] = useState<PostFlag>()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+export default function CreatePost() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const referenceParam = searchParams.get('reference');
+
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
+  const [secretKey, setSecretKey] = useState('');
+  const [referenceId, setReferenceId] = useState(referenceParam || '');
+  const [flag, setFlag] = useState<PostFlag>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (referenceParam) {
+      setReferenceId(referenceParam);
+    }
+  }, [referenceParam]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -57,7 +67,7 @@ export default function CreatePost () {
     setImageUrl(url)
     if (url && videoUrl) {
       setVideoUrl('')
-      toast.info('Video removed as only one media type is allowed')
+      toast('Video removed as only one media type is allowed')
     }
   }
 
@@ -65,15 +75,25 @@ export default function CreatePost () {
     setVideoUrl(url)
     if (url && imageUrl) {
       setImageUrl('')
-      toast.info('Image removed as only one media type is allowed')
+      toast('Image removed as only one media type is allowed')
     }
   }
 
   return (
     <div className='max-w-2xl mx-auto'>
-      <h1 className='text-3xl font-bold mb-6 text-gray-900 dark:text-white'>
-        Create New Post
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
+        {referenceId ? 'Create Referenced Post' : 'Create New Post'}
       </h1>
+
+      {referenceId && (
+        <div className="mb-6">
+          <h2 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Referencing Post:
+          </h2>
+          <ReferencedPost postId={referenceId} />
+        </div>
+      )}
+      
       <form onSubmit={handleSubmit} className='space-y-6'>
         <div>
           <label

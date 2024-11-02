@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase, type Post } from '../lib/supabase';
-import { formatDistanceToNow } from 'date-fns';
 
 type ReferencedPostProps = {
   postId: string;
@@ -16,7 +15,7 @@ export default function ReferencedPost({ postId }: ReferencedPostProps) {
       const { data, error } = await supabase
         .from('posts')
         .select('*')
-        .eq('id', postId)
+        .eq('reference_id', postId)
         .single();
 
       if (!error && data) {
@@ -30,16 +29,16 @@ export default function ReferencedPost({ postId }: ReferencedPostProps) {
 
   if (loading) {
     return (
-      <div className="animate-pulse bg-gray-100 rounded-lg p-4">
-        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+      <div className="animate-pulse bg-gray-100 dark:bg-gray-800 rounded-lg p-4 transition-colors duration-200">
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
       </div>
     );
   }
 
   if (!post) {
     return (
-      <div className="bg-gray-100 rounded-lg p-4 text-gray-500">
-        Referenced post not found
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 text-gray-500 dark:text-gray-400 transition-colors duration-200">
+        Referenced Post ID: {postId}
       </div>
     );
   }
@@ -47,12 +46,13 @@ export default function ReferencedPost({ postId }: ReferencedPostProps) {
   return (
     <Link
       to={`/post/${post.id}`}
-      className="block bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors"
+      className="block bg-gray-50 dark:bg-gray-800 rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
     >
-      <div className="text-sm text-gray-500 mb-1">
-        Referenced post from {formatDistanceToNow(new Date(post.created_at))} ago
-      </div>
-      <h3 className="text-lg font-medium text-gray-900">{post.title}</h3>
+      {post.reference_id && (
+        <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Reference ID: {post.reference_id}
+        </div>
+      )}
     </Link>
   );
 }
