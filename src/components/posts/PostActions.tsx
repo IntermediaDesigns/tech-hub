@@ -13,6 +13,9 @@ export default function PostActions({ postId }: PostActionsProps) {
   const navigate = useNavigate();
 
   const handleDelete = async () => {
+    const secretKey = prompt('Enter the secret key to delete this post:');
+    if (!secretKey) return;
+
     if (!window.confirm('Are you sure you want to delete this post?')) {
       return;
     }
@@ -22,7 +25,8 @@ export default function PostActions({ postId }: PostActionsProps) {
       const { error: deleteError } = await supabase
         .from('posts')
         .delete()
-        .eq('id', postId);
+        .eq('id', postId)
+        .eq('secret_key', secretKey); // Validate secret key
 
       if (deleteError) throw deleteError;
       navigate('/');

@@ -1,15 +1,17 @@
 import React, { useState } from 'react'
 import { useCreatePost } from '../../hooks/useCreatePost'
 import { useAuth } from '../../hooks/useAuth'
+import ImageUpload from './ImageUpload' // Import ImageUpload component
 
 const PostForm: React.FC = () => {
   const { user } = useAuth()
   const { createPost, loading, error } = useCreatePost()
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
-  const [imageUrl, setImageUrl] = useState('')
   const [category, setCategory] = useState('general')
   const [secretKey, setSecretKey] = useState('')
+  const [flag, setFlag] = useState(''); // New state for flag
+  const [uploadedImage, setUploadedImage] = useState<File | null>(null); // New state for uploaded image
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,11 +24,16 @@ const PostForm: React.FC = () => {
     await createPost({
       title,
       content,
-      imageUrl: imageUrl || undefined,
+      imageUrl: uploadedImage ? URL.createObjectURL(uploadedImage) : undefined, // Use uploaded image URL
       category,
-      secretKey: secretKey || undefined
+      secretKey: secretKey || undefined,
+      flag // Include flag in post data
     })
   }
+
+  const handleImageUpload = (file: File) => {
+    setUploadedImage(file); // Set the uploaded image
+  };
 
   if (!user) {
     return <div>Please log in to create a post</div>
@@ -70,22 +77,7 @@ const PostForm: React.FC = () => {
         />
       </div>
 
-      <div>
-        <label
-          htmlFor='imageUrl'
-          className='block text-sm font-medium text-gray-700'
-        >
-          Image URL
-        </label>
-        <input
-          type='url'
-          id='imageUrl'
-          value={imageUrl}
-          onChange={e => setImageUrl(e.target.value)}
-          placeholder='https://example.com/image.jpg'
-          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500'
-        />
-      </div>
+      <ImageUpload onUpload={handleImageUpload} /> {/* Include ImageUpload component */}
 
       <div>
         <label
@@ -112,6 +104,25 @@ const PostForm: React.FC = () => {
           <option value='backend'>Backend</option>
           <option value='webdev'>Web Dev</option>
           <option value='tutorials'>Tech Tutorials</option>
+        </select>
+      </div>
+
+      <div>
+        <label
+          htmlFor='flag'
+          className='block text-sm font-medium text-gray-700'
+        >
+          Flag (optional)
+        </label>
+        <select
+          id='flag'
+          value={flag}
+          onChange={e => setFlag(e.target.value)}
+          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500'
+        >
+          <option value=''>Select a flag</option>
+          <option value='question'>Question</option>
+          <option value='opinion'>Opinion</option>
         </select>
       </div>
 

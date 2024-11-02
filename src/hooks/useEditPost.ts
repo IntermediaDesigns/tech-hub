@@ -30,7 +30,8 @@ export const useEditPost = (postId: string) => {
           content: postData.content || null,
           imageUrl: postData.imageUrl || null,
           secretKey: secretKey,
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
+          flag: postData.flag || null // Include flag in update
         })
         .eq('id', postId);
 

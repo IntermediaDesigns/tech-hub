@@ -79,6 +79,12 @@ export default function PostContent({ post }: PostContentProps) {
           </span>
         </div>
 
+        {post.flag && (
+          <div className='mt-2 text-sm text-gray-600'>
+            Flag: <span className='font-semibold'>{post.flag}</span>
+          </div>
+        )}
+
         {post.content && (
           <div className='mt-4 prose prose-sm max-w-none text-gray-700'>
             {post.content}

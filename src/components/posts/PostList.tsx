@@ -29,6 +29,7 @@ export default function PostList () {
     label: 'Newest'
   })
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedFlag, setSelectedFlag] = useState(''); // New state for selected flag
   const { posts } = usePosts(sortBy.value)
   const { isLoading } = useLoading()
 
@@ -37,15 +38,16 @@ export default function PostList () {
     { value: 'mostUpvoted', label: 'Most Upvoted' }
   ]
 
-  const filterPosts = useCallback((posts: Post[], query: string) => {
-    return posts.filter(
-      post =>
-        post.title.toLowerCase().includes(query.toLowerCase()) ||
-        (post.content || '').toLowerCase().includes(query.toLowerCase())
-    )
-  }, [])
+  const filterPosts = useCallback((posts: Post[], query: string, flag: string) => {
+    return posts.filter(post => {
+      const matchesQuery = post.title.toLowerCase().includes(query.toLowerCase()) ||
+        (post.content || '').toLowerCase().includes(query.toLowerCase());
+      const matchesFlag = flag ? post.flag === flag : true; // Filter by flag if selected
+      return matchesQuery && matchesFlag;
+    });
+  }, []);
 
-  const groupPosts = useCallback((posts: Post[]) => {
+  const groupPostsByCategory = useCallback((posts: Post[]) => {
     const grouped = CATEGORIES.reduce((acc, category) => {
       acc[category] = []
       return acc
@@ -65,15 +67,19 @@ export default function PostList () {
     )
   }, [])
 
-  const filteredPosts = filterPosts(posts, searchQuery)
-  const groupedPosts = groupPosts(filteredPosts)
+  const filteredPosts = filterPosts(posts, searchQuery, selectedFlag); // Pass selectedFlag to filter
+  const groupedPosts = groupPostsByCategory(filteredPosts);
 
   const handleSearch = (value: string) => {
-    setSearchQuery(value)
+    setSearchQuery(value);
   }
 
   const handleSort = (option: SortOption) => {
-    setSortBy(option)
+    setSortBy(option);
+  }
+
+  const handleFlagChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedFlag(e.target.value); // Update selected flag
   }
 
   return (
@@ -90,6 +96,16 @@ export default function PostList () {
           onChange={handleSort}
           options={sortOptions}
         />
+        <select
+          value={selectedFlag}
+          onChange={handleFlagChange}
+          className='mt-1 block w-full sm:w-64 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500'
+          aria-label="Filter by flag" // Added accessible name
+        >
+          <option value=''>All Flags</option>
+          <option value='question'>Question</option>
+          <option value='opinion'>Opinion</option>
+        </select>
       </div>
 
       <div className='space-y-8'>

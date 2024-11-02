@@ -56,7 +56,8 @@ export const useCreatePost = () => {
         authorId: user.id,
         upvotes: 0,
         category: postData.category,
-        updatedAt: timestamp
+        updatedAt: timestamp,
+        flag: postData.flag || null // Include flag in post data
       }
 
       console.log('Creating post with payload:', postPayload)

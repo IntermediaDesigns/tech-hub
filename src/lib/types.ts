@@ -9,6 +9,7 @@ export interface Post {
   upvotes: number;
   secretKey?: string;
   category: string;
+  flag?: string; // Added flag property
 }
 
 export interface Comment {
@@ -31,4 +32,13 @@ export interface PostFormData {
   imageUrl?: string;
   secretKey?: string;
   category: string;
+  flag?: string; // Added flag property
+}
+
+export interface ThemeSettings {
+  colorScheme: 'light' | 'dark' | 'system';
+  primaryColor: 'indigo' | 'blue' | 'purple' | 'rose' | 'emerald';
+  fontSize: 'small' | 'medium' | 'large';
+  showPreviewContent: boolean;
+  cardStyle: 'minimal' | 'bordered' | 'elevated';
 }
