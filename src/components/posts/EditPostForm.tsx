@@ -16,7 +16,8 @@ export default function EditPostForm ({ postId }: EditPostFormProps) {
   const [formData, setFormData] = useState<PostFormData>({
     title: '',
     content: '',
-    imageUrl: ''
+    imageUrl: '',
+    category: '' // Add category
   })
   const [secretKey, setSecretKey] = useState('')
   const [validationErrors, setValidationErrors] = useState<
@@ -28,7 +29,8 @@ export default function EditPostForm ({ postId }: EditPostFormProps) {
       setFormData({
         title: post.title,
         content: post.content || '',
-        imageUrl: post.imageUrl || ''
+        imageUrl: post.imageUrl || '',
+        category: post.category || '' // Add category
       })
     }
   }, [post])

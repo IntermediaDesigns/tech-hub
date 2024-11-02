@@ -15,7 +15,7 @@ export const usePosts = (sortBy: 'newest' | 'mostUpvoted') => {
         const { data, error: postsError } = await supabase
           .from('posts')
           .select('*')
-          .order(sortBy === 'newest' ? 'created_at' : 'upvotes', { ascending: false });
+          .order(sortBy === 'newest' ? 'createdAt' : 'upvotes', { ascending: false });
 
         if (postsError) throw postsError;
         setPosts(data || []);

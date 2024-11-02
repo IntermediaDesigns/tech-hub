@@ -14,8 +14,8 @@ export const useComments = (postId: string) => {
         const { data, error: commentsError } = await supabase
           .from('comments')
           .select('*')
-          .eq('post_id', postId)
-          .order('created_at', { ascending: true });
+          .eq('postId', postId)
+          .order('createdAt', { ascending: true });
 
         if (commentsError) throw commentsError;
         
@@ -23,10 +23,10 @@ export const useComments = (postId: string) => {
         const transformedComments = (data || []).map(comment => ({
           id: comment.id,
           content: comment.content,
-          postId: comment.post_id,
-          authorId: comment.author_id,
-          createdAt: comment.created_at,
-          secretKey: comment.secret_key
+          postId: comment.postId,
+          authorId: comment.authorId,
+          createdAt: comment.createdAt,
+          secretKey: comment.secretKey
         }));
         
         setComments(transformedComments);
@@ -51,10 +51,10 @@ export const useComments = (postId: string) => {
         .insert([
           {
             content,
-            post_id: postId,
-            author_id: userId,
-            secret_key: secretKey,
-            created_at: new Date().toISOString()
+            postId: postId,
+            authorId: userId,
+            secretKey: secretKey,
+            createdAt: new Date().toISOString()
           }
         ])
         .select()
@@ -66,10 +66,10 @@ export const useComments = (postId: string) => {
       const transformedComment = {
         id: data.id,
         content: data.content,
-        postId: data.post_id,
-        authorId: data.author_id,
-        createdAt: data.created_at,
-        secretKey: data.secret_key
+        postId: data.postId,
+        authorId: data.authorId,
+        createdAt: data.createdAt,
+        secretKey: data.secretKey
       };
 
       setComments(prev => [...prev, transformedComment]);
@@ -89,11 +89,11 @@ export const useComments = (postId: string) => {
       if (secretKey) {
         const { data: comment } = await supabase
           .from('comments')
-          .select('secret_key')
+          .select('secretKey')
           .eq('id', commentId)
           .single();
 
-        if (comment?.secret_key !== secretKey) {
+        if (comment?.secretKey !== secretKey) {
           throw new Error('Invalid secret key');
         }
       }
