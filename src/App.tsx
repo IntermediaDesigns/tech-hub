@@ -1,32 +1,36 @@
-import { Routes, Route } from 'react-router-dom'
-import Layout from './components/layout/Layout'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
+import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import CreatePost from './pages/CreatePost'
-import PostPage from './pages/PostPage'
+import PostDetail from './pages/PostDetail'
 import EditPost from './pages/EditPost'
-import CategoryPage from './pages/CategoryPage'
-import Register from './pages/Register'
-import SettingsPage from './pages/SettingsPage' // Import the SettingsPage
 
-import { LoadingProvider } from './context/LoadingContext'
-import { UserProvider } from './context/UserContext'
-
-export default function App () {
+function App () {
   return (
-    <LoadingProvider>
-      <UserProvider>
-        <Routes>
-          <Route element={<Layout />}>
+    <BrowserRouter>
+      <div className='min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200'>
+        <Navbar />
+        <main className='container mx-auto px-4 py-8 max-w-5xl'>
+          <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/create' element={<CreatePost />} />
-            <Route path='/post/:id' element={<PostPage />} />
+            <Route path='/post/:id' element={<PostDetail />} />
             <Route path='/post/:id/edit' element={<EditPost />} />
-            <Route path='/category/:category' element={<CategoryPage />} />
-            <Route path='/register' element={<Register />} />
-            <Route path='/settings' element={<SettingsPage />} /> {/* Add the Settings route */}
-          </Route>
-        </Routes>
-      </UserProvider>
-    </LoadingProvider>
+          </Routes>
+        </main>
+        <Toaster
+          position='bottom-right'
+          toastOptions={{
+            style: {
+              background: 'var(--toast-background)',
+              color: 'var(--toast-foreground)'
+            }
+          }}
+        />
+      </div>
+    </BrowserRouter>
   )
 }
+
+export default App
