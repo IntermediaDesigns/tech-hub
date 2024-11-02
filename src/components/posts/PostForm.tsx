@@ -1,166 +1,141 @@
-import { useState } from 'react';
-import { Input } from '../common/Input';
-import { TextArea } from '../common/TextArea';
-import { useCreatePost } from '../../hooks/useCreatePost';
-import { PostFormData } from '../../lib/types';
-import { useUserContext } from '../../context/UserContext'; // Import the hook
+import React, { useState } from 'react'
+import { useCreatePost } from '../../hooks/useCreatePost'
+import { useAuth } from '../../hooks/useAuth'
 
-const categories = [
-  'JavaScript', 'React', 'HTML', 'CSS', 'Python',
-  'Node.js', 'TypeScript', 'GraphQL', 'Vue.js', 'Angular'
-];
-
-export default function PostForm() {
-  const [formData, setFormData] = useState<PostFormData>({
-    title: '',
-    content: '',
-    imageUrl: '',
-    secretKey: '',
-    category: categories[0] // Default to the first category
-  });
-
-  const [validationErrors, setValidationErrors] = useState<Partial<PostFormData>>({});
-  const { createPost, loading, error } = useCreatePost();
-  const { userId } = useUserContext(); // Access user ID from context
-
-  const validateForm = (): boolean => {
-    const errors: Partial<PostFormData> = {};
-    
-    if (!formData.title.trim()) {
-      errors.title = 'Title is required';
-    }
-    
-    if (!formData.content.trim()) {
-      errors.content = 'Content is required';
-    }
-    
-    if (formData.imageUrl && !isValidUrl(formData.imageUrl)) {
-      errors.imageUrl = 'Please enter a valid URL';
-    }
-    
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const isValidUrl = (url: string): boolean => {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
+const PostForm: React.FC = () => {
+  const { user } = useAuth()
+  const { createPost, loading, error } = useCreatePost()
+  const [title, setTitle] = useState('')
+  const [content, setContent] = useState('')
+  const [imageUrl, setImageUrl] = useState('')
+  const [category, setCategory] = useState('general')
+  const [secretKey, setSecretKey] = useState('')
+  
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     
-    if (!validateForm()) return;
-
-    if (userId) {
-      await createPost(formData, userId); // Pass user ID to createPost
-    } else {
-      setValidationErrors({ title: 'User ID is required to create a post.' });
+    if (!user) {
+      console.error('No user found')
+      return
     }
-  };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear validation error when user starts typing
-    if (validationErrors[name as keyof PostFormData]) {
-      setValidationErrors(prev => ({ ...prev, [name]: undefined }));
-    }
-  };
+    await createPost({
+      title,
+      content,
+      imageUrl: imageUrl || undefined,
+      category,
+      secretKey: secretKey || undefined
+    })
+  }
+
+  if (!user) {
+    return <div>Please log in to create a post</div>
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {error && (
-        <div className="rounded-md bg-red-50 p-4">
-          <div className="flex">
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">
-                Error creating post
-              </h3>
-              <div className="mt-2 text-sm text-red-700">{error}</div>
-            </div>
-          </div>
-        </div>
-      )}
+    <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl mx-auto p-4">
+      <div>
+        <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+          Title *
+        </label>
+        <input
+          type="text"
+          id="title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+          placeholder="Enter post title"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+        />
+      </div>
 
-      <Input
-        label="Title"
-        name="title"
-        value={formData.title}
-        onChange={handleChange}
-        error={validationErrors.title}
-        required
-        disabled={loading}
-      />
+      <div>
+        <label htmlFor="content" className="block text-sm font-medium text-gray-700">
+          Content *
+        </label>
+        <textarea
+          id="content"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          required
+          rows={5}
+          placeholder="Write your post content here"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+        />
+      </div>
 
-      <TextArea
-        label="Content"
-        name="content"
-        value={formData.content}
-        onChange={handleChange}
-        error={validationErrors.content}
-        rows={4}
-        required
-        disabled={loading}
-      />
+      <div>
+        <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700">
+          Image URL
+        </label>
+        <input
+          type="url"
+          id="imageUrl"
+          value={imageUrl}
+          onChange={(e) => setImageUrl(e.target.value)}
+          placeholder="https://example.com/image.jpg"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+        />
+      </div>
 
       <div>
         <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-          Category
+          Category *
         </label>
         <select
           id="category"
-          name="category"
-          value={formData.category}
-          onChange={handleChange}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-          disabled={loading}
+          required
+          defaultValue={""}
+          onChange={(e) => setCategory(e.target.value)}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
         >
-          {categories.map((category) => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
+          <option value="">Select a category</option>
+          <option value="general">General</option>
+          <option value="ai">AI</option>
+          <option value="databases">Databases</option>
+          <option value="technology">Technology</option>
+          <option value="frontend">Frontend</option>
+          <option value="gamedev">Game Dev</option>
+          <option value="mobile">Mobile</option>
+          <option value="backend">Backend</option>
+          <option value="webdev">Web Dev</option>
+          <option value="tutorials">Tech Tutorials</option>
         </select>
       </div>
 
-      <Input
-        label="Image URL (optional)"
-        name="imageUrl"
-        type="url"
-        value={formData.imageUrl}
-        onChange={handleChange}
-        error={validationErrors.imageUrl}
-        placeholder="https://example.com/image.jpg"
-        disabled={loading}
-      />
-
-      <Input
-        label="Secret Key (optional)"
-        name="secretKey"
-        type="password"
-        value={formData.secretKey}
-        onChange={handleChange}
-        error={validationErrors.secretKey}
-        placeholder="For editing/deleting later"
-        disabled={loading}
-      />
-
-      <div className="pt-4">
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:bg-indigo-400 disabled:cursor-not-allowed"
-        >
-          {loading ? 'Creating Post...' : 'Create Post'}
-        </button>
+      <div>
+        <label htmlFor="secretKey" className="block text-sm font-medium text-gray-700">
+          Secret Key
+        </label>
+        <input
+          type="text"
+          id="secretKey"
+          value={secretKey}
+          onChange={(e) => setSecretKey(e.target.value)}
+          placeholder="Optional: Add a secret key for post editing"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+        />
       </div>
+
+      {error && (
+        <div className="text-red-600 text-sm">
+          {error}
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+      >
+        {loading ? 'Creating...' : 'Create Post'}
+      </button>
+
+      <p className="text-sm text-gray-500 mt-2">
+        * Required fields
+      </p>
     </form>
-  );
+  )
 }
+
+export default PostForm

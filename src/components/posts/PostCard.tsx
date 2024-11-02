@@ -1,65 +1,71 @@
-import { useThemeContext } from '../../context/theme-context'
-import { Post } from '../../lib/types'
-import { formatDistanceToNow } from 'date-fns'
+import { Link } from 'react-router-dom';
+import { formatDistanceToNow } from 'date-fns';
+import { Post } from '../../lib/types';
+import { useProfile } from '../../hooks/useProfile';
 
 interface PostCardProps {
-  post: Post
+  post: Post;
 }
 
 export default function PostCard({ post }: PostCardProps) {
-  const { theme } = useThemeContext()
+  const { profile, loading } = useProfile(post.authorId);
 
   const formatDate = (dateString: string) => {
     try {
-      const date = new Date(dateString)
-      // Check if date is valid
-      if (isNaN(date.getTime())) {
-        return 'Invalid date'
-      }
-      return formatDistanceToNow(date, { addSuffix: true })
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Invalid date';
+      return formatDistanceToNow(date, { addSuffix: true });
     } catch {
-      return 'Invalid date'
+      return 'Invalid date';
     }
-  }
+  };
 
   return (
-    <article className={`post-card ${theme.cardStyle} theme-transition`}>
-      <div className='flex items-center justify-between'>
-        <h2
-          className={`font-semibold text-gray-900 dark:text-white text-size-${theme.fontSize}`}
-        >
-          {post.title}
-        </h2>
-        <div className='flex items-center space-x-4 text-gray-500 dark:text-gray-400'>
-          <span>{post.upvotes} upvotes</span>
-        </div>
-      </div>
-
-      {theme.showPreviewContent && post.content && (
-        <p
-          className={`content-preview ${
-            theme.showPreviewContent ? 'expanded' : 'collapsed'
-          }`}
-        >
-          {post.content}
-        </p>
-      )}
-
-      <div className='mt-2 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400'>
-        <time dateTime={post.createdAt}>
-          {post.createdAt ? formatDate(post.createdAt) : 'No date'}
-        </time>
-
-        {post.imageUrl && theme.showPreviewContent && (
-          <div className='mt-2'>
+    <article className="bg-white shadow rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+      <Link to={`/post/${post.id}`} className="block">
+        {post.imageUrl && (
+          <div className="h-48 overflow-hidden">
             <img
               src={post.imageUrl}
-              alt='Post preview'
-              className='rounded-md max-h-48 w-full object-cover'
+              alt=""
+              className="w-full h-full object-cover"
+              onError={e => {
+                e.currentTarget.src = '/api/placeholder/400/300';
+              }}
             />
           </div>
         )}
-      </div>
+        <div className="p-4">
+          <h2 className="text-xl font-semibold text-gray-900 line-clamp-2">{post.title}</h2>
+          
+          <div className="mt-2 flex items-center gap-4 text-sm text-gray-500">
+            <time dateTime={post.createdAt}>
+              {formatDate(post.createdAt)}
+            </time>
+            <span>
+              by{' '}
+              {loading ? (
+                <span className="inline-block w-20 h-4 bg-gray-200 rounded animate-pulse" />
+              ) : (
+                profile?.username || 'Unknown user'
+              )}
+            </span>
+          </div>
+
+          {post.content && (
+            <p className="mt-2 text-gray-600 line-clamp-2">{post.content}</p>
+          )}
+
+          <div className="mt-4 flex items-center justify-between">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+              {post.category}
+            </span>
+            <span className="text-sm text-gray-500">
+              {post.upvotes} upvotes
+            </span>
+          </div>
+        </div>
+      </Link>
     </article>
-  )
+  );
 }

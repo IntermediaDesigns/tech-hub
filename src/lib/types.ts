@@ -1,14 +1,14 @@
 export interface Post {
   id: string;
   title: string;
-  content: string; // Make content required
+  content: string;
   imageUrl?: string;
   createdAt: string;
   updatedAt: string;
   authorId: string;
   upvotes: number;
   secretKey?: string;
-  category: string; // Add category
+  category: string;
 }
 
 export interface Comment {
@@ -27,10 +27,10 @@ export interface SortOption {
 
 export interface PostFormData {
   title: string;
-  content: string; // Make content required
+  content: string;
   imageUrl?: string;
   secretKey?: string;
-  category: string; // Add category
+  category: string;
 }
 
 export interface ThemeSettings {

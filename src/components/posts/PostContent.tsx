@@ -1,11 +1,48 @@
 import { formatDistanceToNow } from 'date-fns'
+import { useEffect, useState } from 'react'
 import { Post } from '../../lib/types'
+import { supabase } from '../../lib/supabase'
 
 interface PostContentProps {
   post: Post
 }
 
+interface Profile {
+  username: string;
+  display_name: string;
+}
+
 export default function PostContent({ post }: PostContentProps) {
+  const [author, setAuthor] = useState<Profile | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchAuthor() {
+      if (!post.authorId) return
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('username, display_name')
+          .eq('id', post.authorId)
+          .single()
+
+        if (error) {
+          console.error('Error fetching author:', error)
+          return
+        }
+
+        setAuthor(data)
+      } catch (err) {
+        console.error('Error fetching author:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchAuthor()
+  }, [post.authorId])
+
   if (!post) {
     return null
   }
@@ -32,7 +69,14 @@ export default function PostContent({ post }: PostContentProps) {
           <time dateTime={post.createdAt}>
             {post.createdAt ? formatDate(post.createdAt) : 'No date'}
           </time>
-          <span>Posted by {post.authorId}</span>
+          <span>
+            Posted by{' '}
+            {loading ? (
+              <span className="inline-block w-20 h-4 bg-gray-200 rounded animate-pulse" />
+            ) : (
+              author?.username || 'Unknown user'
+            )}
+          </span>
         </div>
 
         {post.content && (

@@ -10,9 +10,28 @@ export const useAuth = () => {
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange(
-      (_: AuthChangeEvent, session: Session | null) => {
+      async (event: AuthChangeEvent, session: Session | null) => {
         setSession(session);
         setUser(session?.user ?? null);
+
+        // If user just signed up or signed in, ensure profile exists
+        if (session?.user && (event === 'SIGNED_IN' || event === 'SIGNED_UP')) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+
+          if (!profile) {
+            // Create profile if it doesn't exist
+            await supabase.from('profiles').insert([{
+              id: session.user.id,
+              username: session.user.user_metadata?.username || 'user_' + session.user.id.slice(0, 8),
+              display_name: session.user.user_metadata?.username || 'User',
+              email: session.user.email
+            }]);
+          }
+        }
       }
     );
 
@@ -29,12 +48,6 @@ export const useAuth = () => {
     setLoading(true);
     setError(null);
     try {
-      // Validate username
-      if (!username.match(/^[a-zA-Z0-9_-]{3,30}$/)) {
-        throw new Error('Username must be between 3-30 characters and contain only letters, numbers, underscores, and hyphens');
-      }
-
-      // Create auth entry first
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -49,25 +62,17 @@ export const useAuth = () => {
       if (signUpError) throw signUpError;
       if (!authData.user) throw new Error('Failed to create user');
 
-      // Then create profile entry
-      try {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([{
-            id: authData.user.id,
-            username,
-            display_name: username,
-            email
-          }]);
+      // Create profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert([{
+          id: authData.user.id,
+          username,
+          display_name: username,
+          email
+        }]);
 
-        if (profileError) {
-          console.error('Profile creation error:', profileError);
-          // Don't throw here, as the auth part succeeded
-        }
-      } catch (profileErr) {
-        console.error('Profile creation error:', profileErr);
-        // Don't throw here either
-      }
+      if (profileError) throw profileError;
 
       return authData.user;
     } catch (err) {
@@ -87,7 +92,7 @@ export const useAuth = () => {
       if (username.includes('@')) {
         const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
           email: username,
-          password,
+          password
         });
 
         if (signInError) throw signInError;
@@ -110,7 +115,7 @@ export const useAuth = () => {
       // Sign in using the email
       const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email: profile.email,
-        password,
+        password
       });
 
       if (signInError) throw signInError;
