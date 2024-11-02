@@ -90,7 +90,7 @@ export default function PostContent({ post }: PostContentProps) {
             <img
               src={post.imageUrl}
               alt='Post attachment'
-              className='rounded-lg max-h-96 w-full object-cover'
+              className='rounded-lg max-h-96 w-full object-scale-down'
               onError={e => {
                 e.currentTarget.src = '/api/placeholder/800/400'
                 e.currentTarget.alt = 'Image failed to load'

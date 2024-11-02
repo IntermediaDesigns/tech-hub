@@ -32,11 +32,3 @@ export interface PostFormData {
   secretKey?: string;
   category: string;
 }
-
-export interface ThemeSettings {
-  colorScheme: 'light' | 'dark' | 'system';
-  primaryColor: 'indigo' | 'blue' | 'purple' | 'rose' | 'emerald';
-  fontSize: 'small' | 'medium' | 'large';
-  showPreviewContent: boolean;
-  cardStyle: 'minimal' | 'bordered' | 'elevated';
-}

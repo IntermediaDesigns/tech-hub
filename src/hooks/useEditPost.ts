@@ -14,22 +14,23 @@ export const useEditPost = (postId: string) => {
       // First verify the secret key
       const { data: existingPost } = await supabase
         .from('posts')
-        .select('secret_key')
+        .select('secretKey')
         .eq('id', postId)
         .single();
 
-      if (!existingPost || existingPost.secret_key !== secretKey) {
+      if (!existingPost || existingPost.secretKey !== secretKey) {
         throw new Error('Invalid secret key');
       }
 
-      // Update the post
+      // Update the post - using camelCase, Supabase will handle conversion to snake_case
       const { error: updateError } = await supabase
         .from('posts')
         .update({
           title: postData.title,
           content: postData.content || null,
-          image_url: postData.imageUrl || null,
-          updated_at: new Date().toISOString()
+          imageUrl: postData.imageUrl || null,
+          secretKey: secretKey,
+          updatedAt: new Date().toISOString()
         })
         .eq('id', postId);
 
