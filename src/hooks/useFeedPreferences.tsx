@@ -3,8 +3,9 @@ import type { UserPreferences } from '../lib/supabase';
 
 const DEFAULT_PREFERENCES: UserPreferences = {
   theme: 'system',
-  showContentOnFeed: true, // Changed to true by default
-  showImagesOnFeed: true, // Changed to true by default
+  showContentOnFeed: true,
+  showImagesOnFeed: true,
+  showVideosOnFeed: true,
 };
 
 export function useFeedPreferences() {
@@ -39,9 +40,17 @@ export function useFeedPreferences() {
     }));
   };
 
+  const toggleVideoVisibility = () => {
+    setPreferences(prev => ({
+      ...prev,
+      showVideosOnFeed: !prev.showVideosOnFeed,
+    }));
+  };
+
   return {
     preferences,
     toggleContentVisibility,
     toggleImageVisibility,
+    toggleVideoVisibility,
   };
 }

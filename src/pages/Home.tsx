@@ -146,6 +146,14 @@ export default function Home () {
                         className='w-40 h-auto object-cover rounded-lg mb-2'
                       />
                     )}
+                    {preferences?.showVideosOnFeed && post.video_url && (
+                      <iframe
+                        src={post.video_url}
+                        className="w-full aspect-video rounded-lg mb-2"
+                        allowFullScreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      />
+                    )}
                     {preferences?.showContentOnFeed && post.content && (
                       <p className='text-gray-600 dark:text-gray-300 mb-2 line-clamp-2'>
                         {post.content}

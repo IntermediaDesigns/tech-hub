@@ -1,9 +1,13 @@
-import { Eye, EyeOff, Image } from 'lucide-react'
+import { Eye, EyeOff, Image, Video } from 'lucide-react'
 import { useFeedPreferences } from '../hooks/useFeedPreferences'
 
 export default function FeedPreferences () {
-  const { preferences, toggleContentVisibility, toggleImageVisibility } =
-    useFeedPreferences()
+  const {
+    preferences,
+    toggleContentVisibility,
+    toggleImageVisibility,
+    toggleVideoVisibility
+  } = useFeedPreferences()
 
   return (
     <div className='flex items-center space-x-2 p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm transition-colors duration-200'>
@@ -36,6 +40,17 @@ export default function FeedPreferences () {
         title={preferences.showImagesOnFeed ? 'Hide images' : 'Show images'}
       >
         <Image className='w-4 h-4' />
+      </button>
+      <button
+        onClick={toggleVideoVisibility}
+        className={`p-2 rounded-md transition-colors ${
+          preferences.showVideosOnFeed
+            ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300'
+            : 'text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
+        }`}
+        title={preferences.showVideosOnFeed ? 'Hide videos' : 'Show videos'}
+      >
+        <Video className='w-4 h-4' />
       </button>
     </div>
   )

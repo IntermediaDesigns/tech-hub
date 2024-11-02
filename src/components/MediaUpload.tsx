@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from 'react'
 import { Upload, X, Link as LinkIcon } from 'lucide-react'
 import { supabase } from '../lib/supabase'
@@ -19,13 +20,41 @@ export default function MediaUpload ({
   const [showUrlInput, setShowUrlInput] = useState(false)
   const [urlInput, setUrlInput] = useState(currentUrl || '')
 
+  const getYouTubeVideoId = (url: string): string | null => {
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+      /^[a-zA-Z0-9_-]{11}$/
+    ]
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern)
+      if (match) return match[1]
+    }
+    return null
+  }
+
   const validateUrl = (url: string) => {
     try {
       new URL(url)
-      return true
+      if (type === 'image') {
+        return url.match(/\.(jpg|jpeg|png|gif|webp)$/i)
+      } else {
+        return getYouTubeVideoId(url) || url.match(/\.(mp4|webm|ogg)$/i)
+      }
     } catch {
+      if (type === 'video' && getYouTubeVideoId(url)) {
+        return true
+      }
       return false
     }
+  }
+
+  const processVideoUrl = (url: string): string => {
+    const videoId = getYouTubeVideoId(url)
+    if (videoId) {
+      return `https://www.youtube.com/embed/${videoId}`
+    }
+    return url
   }
 
   const handleFileUpload = async (
@@ -36,10 +65,20 @@ export default function MediaUpload ({
       const file = event.target.files?.[0]
       if (!file) return
 
+      // Validate file type
+      if (type === 'image' && !file.type.startsWith('image/')) {
+        toast.error('Please select an image file')
+        return
+      }
+
+      if (type === 'video' && !file.type.startsWith('video/')) {
+        toast.error('Please select a video file')
+        return
+      }
+
       // Create preview
       const objectUrl = URL.createObjectURL(file)
       setPreview(objectUrl)
-      setShowUrlInput(false)
 
       // Upload to Supabase Storage
       const fileExt = file.name.split('.').pop()
@@ -56,11 +95,11 @@ export default function MediaUpload ({
       } = supabase.storage.from('media').getPublicUrl(`${type}s/${fileName}`)
 
       onUploadComplete(publicUrl)
-      setUrlInput('')
       toast.success('Upload complete!')
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading file:', error)
-      toast.error('Upload failed. Please try again.')
+      toast.error(error.message || 'Upload failed. Please try again.')
+      setPreview(null)
     } finally {
       setUploading(false)
     }
@@ -76,12 +115,17 @@ export default function MediaUpload ({
     }
 
     if (!validateUrl(trimmedUrl)) {
-      toast.error('Please enter a valid URL')
+      toast.error(
+        `Please enter a valid ${type} URL${
+          type === 'video' ? ' (YouTube or direct video file)' : ''
+        }`
+      )
       return
     }
 
-    setPreview(trimmedUrl)
-    onUploadComplete(trimmedUrl)
+    const finalUrl = type === 'video' ? processVideoUrl(trimmedUrl) : trimmedUrl
+    setPreview(finalUrl)
+    onUploadComplete(finalUrl)
     setShowUrlInput(false)
     toast.success('URL added successfully!')
   }
@@ -121,17 +165,16 @@ export default function MediaUpload ({
               }}
             />
           ) : (
-            <video
+            <iframe
               src={preview}
-              controls
-              className='max-w-full rounded-lg'
+              className='w-full aspect-video rounded-lg'
+              allowFullScreen
+              allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
               onError={() => {
                 toast.error('Failed to load video')
                 clearMedia()
               }}
-            >
-              Your browser does not support the video tag.
-            </video>
+            />
           )}
         </div>
       </div>
@@ -148,7 +191,11 @@ export default function MediaUpload ({
               value={urlInput}
               onChange={e => setUrlInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleUrlSubmit()}
-              placeholder={`Enter ${type} URL...`}
+              placeholder={
+                type === 'video'
+                  ? 'Enter YouTube URL or video ID...'
+                  : 'Enter image URL...'
+              }
               className='flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-colors duration-200'
             />
             <button
@@ -160,6 +207,11 @@ export default function MediaUpload ({
               Add
             </button>
           </div>
+          <p className='text-sm text-gray-500 dark:text-gray-400'>
+            {type === 'video'
+              ? 'You can paste a YouTube URL or video ID'
+              : 'Enter a direct URL to your image'}
+          </p>
           <button
             type='button'
             onClick={() => {
@@ -174,28 +226,32 @@ export default function MediaUpload ({
       ) : (
         <div className='flex flex-col gap-2'>
           <div className='flex gap-2'>
-            <label className='flex-1 btn-secondary cursor-pointer text-center'>
+            <label className='flex-1'>
               <input
                 type='file'
-                accept={type === 'image' ? 'image/*' : 'video/*'}
                 onChange={handleFileUpload}
+                accept={type === 'image' ? 'image/*' : 'video/*'}
                 className='hidden'
                 disabled={uploading}
               />
-              <Upload className='w-4 h-4 mr-2 inline-block' />
-              {uploading ? 'Uploading...' : `Upload ${type}`}
+              <div className='btn-secondary w-full flex justify-center items-center cursor-pointer'>
+                <Upload className='w-4 h-4 mr-2' />
+                {uploading ? 'Uploading...' : `Upload ${type}`}
+              </div>
             </label>
             <button
               type='button'
               onClick={() => setShowUrlInput(true)}
-              className='flex-1 btn-secondary'
+              className='btn-secondary whitespace-nowrap'
             >
               <LinkIcon className='w-4 h-4 mr-2' />
               Add URL
             </button>
           </div>
           <p className='text-sm text-gray-500 dark:text-gray-400 text-center'>
-            Choose one option to add your {type}
+            {type === 'video'
+              ? 'Upload a video file or add a YouTube URL'
+              : 'Upload an image file or enter an image URL'}
           </p>
         </div>
       )}
