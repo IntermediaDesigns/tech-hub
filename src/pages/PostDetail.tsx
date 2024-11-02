@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowUpCircle, Edit2, Trash2, ArrowLeft } from 'lucide-react';
 import { supabase, type Post, type Comment } from '../lib/supabase';
