@@ -14,6 +14,7 @@ export default function SearchBar({ value, onChange, placeholder = 'Search posts
         <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
       </div>
       <input
+      id='search'
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}

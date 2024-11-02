@@ -1,11 +1,9 @@
-import { Link, useLocation } from 'react-router-dom';
-import { PlusIcon, UserIcon } from '@heroicons/react/24/outline';
-import ThemeToggle from '../theme/ThemeToggle';
-import { useAuth } from '../../hooks/useAuth';
+import { Link } from 'react-router-dom'
+import { PlusIcon, UserIcon } from '@heroicons/react/24/outline'
+import { useAuth } from '../../hooks/useAuth'
 
-export default function Header() {
-  const location = useLocation();
-  const { user, logout } = useAuth();
+export default function Header () {
+  const { user, logout } = useAuth()
 
   return (
     <header className='bg-white shadow'>
@@ -16,16 +14,6 @@ export default function Header() {
           </Link>
 
           <nav className='flex items-center gap-6'>
-            <ThemeToggle />
-            <Link
-              to='/'
-              className={`text-gray-600 hover:text-gray-900 ${
-                location.pathname === '/' ? 'text-gray-900' : ''
-              }`}
-            >
-              Home
-            </Link>
-
             {user ? (
               <>
                 <Link
@@ -35,7 +23,7 @@ export default function Header() {
                   <PlusIcon className='h-5 w-5' aria-hidden='true' />
                   Create Post
                 </Link>
-                <button 
+                <button
                   onClick={() => logout()}
                   className='inline-flex items-center gap-2 rounded-md border border-indigo-600 px-4 py-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors duration-200'
                 >
@@ -43,7 +31,7 @@ export default function Header() {
                 </button>
               </>
             ) : (
-              <Link 
+              <Link
                 to='/register'
                 className='inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
               >
@@ -55,5 +43,5 @@ export default function Header() {
         </div>
       </div>
     </header>
-  );
+  )
 }

@@ -61,7 +61,7 @@ export default function PostList () {
 
     // Remove empty categories
     return Object.fromEntries(
-      Object.entries(grouped).filter(([_, posts]) => posts.length > 0)
+      Object.entries(grouped).filter(([, posts]) => posts.length > 0)
     )
   }, [])
 
