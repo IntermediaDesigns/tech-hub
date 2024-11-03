@@ -39,7 +39,7 @@ The following **additional** features are implemented:
 
 ## Video Walkthrough
 
-![TechHub](/techhub.gif)
+![TechHub](./public/techhub.gif)
 
 <!-- Replace this with whatever GIF tool you used! -->
 GIF created with adobe express
