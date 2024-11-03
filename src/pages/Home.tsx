@@ -139,7 +139,7 @@ export default function Home () {
                     <h2 className='text-xl mt-4 font-semibold text-gray-900 w-full dark:text-white mb-2'>
                       {post.title}
                     </h2>
-                    <div className='flex items-center gap-4 mb-4 flex-wrap'>
+                    <div className='flex-col items-center gap-4 mb-4 lg:flex md:flex-row'>
                     {preferences?.showImagesOnFeed && post.image_url && (
                       <img
                         src={post.image_url}
