@@ -2,7 +2,7 @@
 
 Submitted by: **Lynjai Jimenez**
 
-This web app: **insert description**
+This web app: **A Tech forum where users can create posts, share thoughts, ask questions and more!**
 
 Time spent: **6** hours spent in total
 
@@ -39,12 +39,10 @@ The following **additional** features are implemented:
 
 ## Video Walkthrough
 
-Here's a walkthrough of implemented user stories:
-
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+![TechHub](/techhub.gif)
 
 <!-- Replace this with whatever GIF tool you used! -->
-GIF created with ...  
+GIF created with adobe express
 <!-- Recommended tools:
 [Kap](https://getkap.co/) for macOS
 [ScreenToGif](https://www.screentogif.com/) for Windows
@@ -53,6 +51,7 @@ GIF created with ...
 ## Notes
 
 Describe any challenges encountered while building the app.
+- none
 
 ## License
 
