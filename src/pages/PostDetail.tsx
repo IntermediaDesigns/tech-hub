@@ -2,19 +2,18 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowUpCircle, Edit2, Trash2, ArrowLeft, Reply } from 'lucide-react'
-import { supabase, type Post } from '../lib/supabase'
+import { supabase, type Post, type Comment } from '../lib/supabase'
 import { formatDistanceToNow } from 'date-fns'
 import toast from 'react-hot-toast'
 import CommentForm from '../components/CommentForm'
 import CommentList from '../components/CommentList'
-import ReferencedPost from '../components/ReferencedPost'
 import LoadingSpinner from '../components/LoadingSpinner'
 
 export default function PostDetail () {
   const { id } = useParams()
   const navigate = useNavigate()
   const [post, setPost] = useState<Post | null>(null)
-  const [comments, setComments] = useState([])
+  const [comments, setComments] = useState<Comment[]>([])
   const [loading, setLoading] = useState(true)
   const [secretKey, setSecretKey] = useState('')
   const [showSecretKeyInput, setShowSecretKeyInput] = useState(false)
@@ -123,12 +122,15 @@ export default function PostDetail () {
       </Link>
 
       <div className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-colors duration-200'>
-        {post.reference_id && (
-          <div className='mb-6'>
-            <ReferencedPost postId={post.reference_id} />
-          </div>
-        )}
-
+        <div className='flex justify-end items-center mb-6'>
+          <Link
+            to={`/create?reference=${post.reference_id || post.id}`}
+            className='btn-secondary'
+            title='Repost with reference'
+          >
+            <Reply className='w-4 h-4' />
+          </Link>
+        </div>
         {post.flag && (
           <span
             className={`inline-block px-2 py-1 rounded-full text-xs font-medium mb-4 ${
@@ -152,13 +154,6 @@ export default function PostDetail () {
             {post.title}
           </h1>
           <div className='flex items-center space-x-2'>
-            <Link
-              to={`/create?reference=${post.reference_id || post.id}`}
-              className='btn-secondary'
-              title='Repost with reference'
-            >
-              <Reply className='w-4 h-4' />
-            </Link>
             <button
               onClick={handleUpvote}
               className='flex items-center space-x-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors'
@@ -197,6 +192,7 @@ export default function PostDetail () {
 
         {post.video_url && (
           <iframe
+            title='Video preview'
             src={post.video_url}
             className='w-full aspect-video rounded-lg mb-6'
             allowFullScreen
