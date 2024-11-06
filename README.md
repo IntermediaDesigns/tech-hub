@@ -42,6 +42,7 @@ The following **additional** features are implemented:
 ![TechHub](./public/techhub.gif)
 
 Youtube Video: [Tech Hub](https://youtu.be/vhwuPRUMoyk)
+Google Drive Video: [Tech Hub](https://drive.google.com/file/d/1siRXncpmYgJG6b3sntKLzbZXbT658J1m/view?usp=sharing)
 
 <!-- Replace this with whatever GIF tool you used! -->
 GIF created with adobe express
