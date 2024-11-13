@@ -257,7 +257,7 @@ export default function MediaUpload({
           />
           {imageError && (
             <p className="text-red-500 mt-2">
-              Image link is blocked by CORS, try a different link.
+              Image link is blocked by CORS, try a different link
             </p>
           )}
         </div>
@@ -273,4 +273,3 @@ export default function MediaUpload({
       )}
     </div>
   );
-}
