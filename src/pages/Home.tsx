@@ -144,14 +144,14 @@ export default function Home () {
                       <img
                         src={post.image_url}
                         alt={post.title}
-                        className='w-40 h-auto object-cover rounded-lg mb-2'
+                        className='md:max-w-[450px] lg:max-w-[450px] h-auto object-cover rounded-lg mb-2'
                       />
                     )}
                     {preferences?.showVideosOnFeed && post.video_url && (
                       <iframe
                         src={post.video_url}
                         title={post.title}
-                        className="min-w-[350px] aspect-video rounded-lg mb-2"
+                        className="md:min-w-[450px] lg:min-w-[450px] aspect-video rounded-lg mb-2"
                         allowFullScreen
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       />
