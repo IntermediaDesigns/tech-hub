@@ -158,9 +158,9 @@ export default function MediaUpload({
 
       onUploadComplete(publicUrl);
       toast.success('Upload complete!');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error uploading file:', error);
-      toast.error(error.message || 'Upload failed. Please try again.');
+      toast.error((error as Error).message || 'Upload failed. Please try again.');
       setPreview(null);
     } finally {
       setUploading(false);
