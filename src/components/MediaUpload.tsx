@@ -66,6 +66,7 @@ export default function MediaUpload({
       const img = new Image();
       img.onload = () => resolve(true);
       img.onerror = () => resolve(false);
+      img.crossOrigin = 'anonymous';
       img.src = url;
     });
   };
@@ -93,7 +94,9 @@ export default function MediaUpload({
       toast.dismiss(loading);
 
       if (!isValid) {
-        toast.error('Image link is blocked by CORS, try a different link');
+        setImageError(true);
+        setPreview(urlInput); // Set preview to trigger error display
+        toast.error('Image link is blocked by CORS, try a different link.');
         return;
       }
     }
@@ -178,7 +181,6 @@ export default function MediaUpload({
 
   const handleImageError = () => {
     setImageError(true);
-    setPreview(null);
     onUploadComplete('');
   };
 
@@ -205,7 +207,7 @@ export default function MediaUpload({
           <LinkIcon className="w-4 h-4 mr-2" />
           Add URL
         </button>
-        {preview && (
+        {preview && !imageError && (
           <button
             type="button"
             onClick={clearMedia}
@@ -248,16 +250,17 @@ export default function MediaUpload({
 
       {preview && type === 'image' && (
         <div>
-          <img
-            src={preview}
-            alt="Preview"
-            className="max-w-full h-auto rounded-lg"
-            crossOrigin="anonymous"
-            onError={handleImageError}
-          />
-          {imageError && (
+          {!imageError ? (
+            <img
+              src={preview}
+              alt="Preview"
+              className="max-w-full h-auto rounded-lg"
+              crossOrigin="anonymous"
+              onError={handleImageError}
+            />
+          ) : (
             <p className="text-red-500 mt-2">
-              Image link is blocked by CORS, try a different link
+              Image link is blocked by CORS, try a different link.
             </p>
           )}
         </div>
@@ -273,3 +276,4 @@ export default function MediaUpload({
       )}
     </div>
   );
+}
