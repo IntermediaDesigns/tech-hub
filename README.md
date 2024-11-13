@@ -39,6 +39,10 @@ The following **additional** features are implemented:
 
 ## Video Walkthrough
 
+Deployed Website URL: 
+[Tech Hub - Vercel](https://tech-hub-rho.vercel.app//)
+[Tech Hub - Netlify](https://techhub-forum.netlify.app/)
+
 ![TechHub](./public/techhub.gif)
 
 Youtube Video: [Tech Hub](https://youtu.be/vhwuPRUMoyk)
