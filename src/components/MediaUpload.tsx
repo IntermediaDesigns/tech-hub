@@ -23,6 +23,7 @@ export default function MediaUpload({
   const [preview, setPreview] = useState<string | null>(currentUrl || null);
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [urlInput, setUrlInput] = useState(currentUrl || '');
+  const [imageError, setImageError] = useState(false);
 
   const getYouTubeVideoId = (url: string): string | null => {
     const patterns = [
@@ -92,11 +93,12 @@ export default function MediaUpload({
       toast.dismiss(loading);
 
       if (!isValid) {
-        toast.error('Invalid or inaccessible image URL');
+        toast.error('Image link is blocked by CORS, try a different link');
         return;
       }
     }
 
+    setImageError(false);
     const finalUrl = type === 'video' ? processVideoUrl(urlInput) : urlInput;
     setPreview(finalUrl);
     onUploadComplete(finalUrl);
@@ -128,6 +130,7 @@ export default function MediaUpload({
       // Create preview
       const objectUrl = URL.createObjectURL(file);
       setPreview(objectUrl);
+      setImageError(false);
 
       // Upload to Supabase Storage
       const fileExt = file.name.split('.').pop();
@@ -169,6 +172,13 @@ export default function MediaUpload({
   const clearMedia = () => {
     setPreview(null);
     setUrlInput('');
+    setImageError(false);
+    onUploadComplete('');
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+    setPreview(null);
     onUploadComplete('');
   };
 
@@ -237,12 +247,20 @@ export default function MediaUpload({
       )}
 
       {preview && type === 'image' && (
-        <img
-          src={preview}
-          alt="Preview"
-          className="max-w-full h-auto rounded-lg"
-          crossOrigin="anonymous"
-        />
+        <div>
+          <img
+            src={preview}
+            alt="Preview"
+            className="max-w-full h-auto rounded-lg"
+            crossOrigin="anonymous"
+            onError={handleImageError}
+          />
+          {imageError && (
+            <p className="text-red-500 mt-2">
+              Image link is blocked by CORS, try a different link.
+            </p>
+          )}
+        </div>
       )}
       {preview && type === 'video' && (
         <iframe
