@@ -61,13 +61,12 @@ export default function MediaUpload({
   };
 
   const testImageUrl = async (url: string): Promise<boolean> => {
-    try {
-      const response = await fetch(url, { method: 'HEAD' });
-      const contentType = response.headers.get('content-type');
-      return contentType ? contentType.startsWith('image/') : false;
-    } catch {
-      return false;
-    }
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = url;
+    });
   };
 
   const processVideoUrl = (url: string): string => {
@@ -242,6 +241,7 @@ export default function MediaUpload({
           src={preview}
           alt="Preview"
           className="max-w-full h-auto rounded-lg"
+          crossOrigin="anonymous"
         />
       )}
       {preview && type === 'video' && (
