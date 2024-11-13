@@ -9,7 +9,7 @@ import {
   Reply,
   GitBranch
 } from 'lucide-react'
-import { supabase, type Post } from '../lib/supabase'
+import { supabase, type Post, type Comment } from '../lib/supabase'
 import { formatDistanceToNow } from 'date-fns'
 import toast from 'react-hot-toast'
 import CommentForm from '../components/CommentForm'
@@ -20,7 +20,7 @@ export default function PostDetail () {
   const { id } = useParams()
   const navigate = useNavigate()
   const [post, setPost] = useState<Post | null>(null)
-  const [comments, setComments] = useState([])
+  const [comments, setComments] = useState<Comment[]>([])
   const [loading, setLoading] = useState(true)
   const [secretKey, setSecretKey] = useState('')
   const [showSecretKeyInput, setShowSecretKeyInput] = useState(false)
@@ -115,7 +115,7 @@ export default function PostDetail () {
 
     if (error) {
       toast.error('Failed to add comment')
-    } else {
+    } else if (data) {
       setComments([...comments, data[0]])
       toast.success('Comment added!')
     }

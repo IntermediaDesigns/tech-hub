@@ -4,6 +4,7 @@ import type { PostFlag } from '../lib/supabase'
 type PostFlagSelectProps = {
   value: PostFlag | undefined
   onChange: (flag: PostFlag | undefined) => void
+  required?: boolean
 }
 
 const FLAGS: { value: PostFlag; label: string; color: string }[] = [
@@ -38,12 +39,13 @@ const FLAGS: { value: PostFlag; label: string; color: string }[] = [
 
 export default function PostFlagSelect ({
   value,
-  onChange
+  onChange,
+  required
 }: PostFlagSelectProps) {
   return (
     <div className='space-y-2'>
       <label className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
-        Post Category
+        Post Category {required && '*'}
       </label>
       <div className='flex flex-wrap gap-2'>
         {FLAGS.map(flag => (

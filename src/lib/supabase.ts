@@ -6,10 +6,6 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true
-  },
-  storage: {
-    retryInterval: 0.5,
-    maxRetryAttempts: 3
   }
 });
 

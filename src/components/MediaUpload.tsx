@@ -42,7 +42,7 @@ export default function MediaUpload({
       new URL(url);
       if (type === 'image') {
         return (
-          url.match(/\.(jpg|jpeg|png|gif|webp)([\?#].*)?$/i) ||
+          url.match(/\.(jpg|jpeg|png|gif|webp)([?#].*)?$/i) ||
           url.match(/\/(img|image|photo|static|media|uploads|cdn)\/.*$/i) ||
           url.match(/\?(.*&)?(image|img|src)=/i) ||
           url.match(
@@ -114,7 +114,7 @@ export default function MediaUpload({
 
       // Validate file type
       const allowedTypes = type === 'image' ? ALLOWED_MIME_TYPES.IMAGE : ALLOWED_MIME_TYPES.VIDEO;
-      if (!allowedTypes.includes(file.type)) {
+      if (!allowedTypes.some(mimeType => mimeType === file.type)) {
         toast.error(`Please select a valid ${type} file`);
         return;
       }

@@ -21,7 +21,6 @@ export default function CreatePost() {
   const [flag, setFlag] = useState<PostFlag>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isReferencePost, setIsReferencePost] = useState(false);
-  const [referencedPost, setReferencedPost] = useState<any>(null);
 
   useEffect(() => {
     if (referenceParam) {
@@ -41,7 +40,6 @@ export default function CreatePost() {
 
       if (error) throw error;
       if (data) {
-        setReferencedPost(data);
         setFlag(data.flag as PostFlag);
       }
     } catch (error) {
@@ -151,9 +149,10 @@ export default function CreatePost() {
         toast.success(`Reference ID: ${finalReferenceId}`);
       }
       navigate(`/post/${data.id}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating post:', error);
-      toast.error(error.message || 'Failed to create post. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create post. Please try again.';
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -163,7 +162,9 @@ export default function CreatePost() {
     setImageUrl(url);
     if (url && videoUrl) {
       setVideoUrl('');
-      toast.info('Video removed as only one media type is allowed');
+      toast('Video removed as only one media type is allowed', {
+        icon: 'ℹ️'
+      });
     }
   };
 
@@ -171,7 +172,9 @@ export default function CreatePost() {
     setVideoUrl(url);
     if (url && imageUrl) {
       setImageUrl('');
-      toast.info('Image removed as only one media type is allowed');
+      toast('Image removed as only one media type is allowed', {
+        icon: 'ℹ️'
+      });
     }
   };
 
@@ -219,8 +222,7 @@ export default function CreatePost() {
 
         <PostFlagSelect 
           value={flag} 
-          onChange={setFlag} 
-          required={true}
+          onChange={setFlag}
         />
 
         <div>
